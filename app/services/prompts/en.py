@@ -22,18 +22,42 @@ class EnglishPrompts:
     Generated title:
     """
 
-    # 説明文生成プロンプト
+    # サブタイトル生成プロンプト
+    SUBTITLE_GENERATION = """
+    Generate an App Store app subtitle based on the following information.
+    
+    App Name: {app_name}
+    App Features: {app_features}
+    Target Audience: {target_audience}
+    
+    Requirements:
+    - Within 30 characters (strictly enforced)
+    - Exclude main keyword ({main_keyword})
+    - Express app value attractively
+    - Memorable and impressive expression
+    - Concisely convey app functionality and features
+    
+    Generated subtitle:
+    """
+
+    # 概要生成プロンプト
     DESCRIPTION_GENERATION = """
     Generate an App Store app description based on the following information.
     
-    App Info: {app_info}
-    Keywords: {keywords}
+    App Name: {app_name}
+    App Features: {app_features}
+    Main Keyword: {main_keyword}
+    Related Keywords: {related_keywords}
+    Target Audience: {target_audience}
     
     Requirements:
-    - Within 4000 characters
-    - Naturally incorporate main keywords
-    - Clearly state app value proposition
+    - Within 4000 characters (strictly enforced)
+    - Naturally include main keyword ({main_keyword}) 4-7 times
+    - Clearly explain app value proposition
     - Emphasize user problem solving
+    - Detail app's main features
+    - Show specific benefits to target users
+    - Readable and attractive text structure
     
     Generated description:
     """
