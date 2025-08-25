@@ -9,7 +9,13 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # Google AI設定
-    google_api_key: str
+    google_api_key: Optional[str] = None
+
+    # Gemini API設定
+    gemini_api_key: Optional[str] = None
+    gemini_model: str = "gemini-pro"
+    gemini_timeout: int = 30
+    gemini_max_retries: int = 3
 
     # アプリケーション設定
     app_name: str = "ASO Text Generator API"
