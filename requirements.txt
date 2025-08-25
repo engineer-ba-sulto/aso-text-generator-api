@@ -21,6 +21,9 @@ pydantic-settings>=2.0.0
 # HTTP client (for external API calls)
 httpx>=0.24.0
 
+# System monitoring
+psutil>=5.9.0
+
 # Logging
 loguru>=0.7.0
 
