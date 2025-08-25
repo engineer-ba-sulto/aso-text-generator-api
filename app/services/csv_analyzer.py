@@ -10,6 +10,7 @@ import pandas as pd
 from app.models.csv_models import CSVData
 from app.services.csv_validator import CSVValidator
 from app.services.keyword_scorer import KeywordScoringService
+from app.services.keyword_selector import KeywordSelectionService
 
 
 class CSVAnalyzer:
@@ -19,6 +20,7 @@ class CSVAnalyzer:
         """初期化"""
         self.validator = CSVValidator()
         self.scoring_service = KeywordScoringService()
+        self.selection_service = KeywordSelectionService()
 
     def analyze_csv(self, file_path: str) -> Dict[str, Any]:
         """
@@ -36,11 +38,17 @@ class CSVAnalyzer:
         # キーワードスコアリングを実行
         scoring_results = self.scoring_service.score_keywords(csv_data.keywords)
 
+        # 主要キーワードを選定
+        selection_result = self.selection_service.select_primary_keyword(
+            csv_data.keywords
+        )
+
         # 分析結果を返す
         return {
             "total_keywords": len(csv_data.keywords),
             "validated_data": csv_data,
             "scoring_results": scoring_results,
+            "selection_result": selection_result,
             "analysis_complete": True,
         }
 

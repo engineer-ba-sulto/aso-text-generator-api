@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 from pydantic import BaseModel, Field, field_validator
@@ -58,3 +58,43 @@ class ScoringResults(BaseModel):
     )
     total_count: int = Field(..., ge=1, description="総キーワード数")
     average_score: float = Field(..., ge=0.0, le=1.0, description="平均スコア")
+
+
+class CandidateKeyword(BaseModel):
+    """候補キーワードモデル"""
+
+    rank: int = Field(..., ge=1, description="順位")
+    keyword: str = Field(..., description="キーワード")
+    score: float = Field(..., ge=0.0, le=1.0, description="スコア")
+    ranking: int = Field(..., ge=1, le=1000, description="ランキング")
+    popularity: float = Field(..., ge=0.0, le=100.0, description="人気度")
+    difficulty: float = Field(..., ge=0.0, le=100.0, description="難易度")
+
+
+class ComponentScores(BaseModel):
+    """要素スコアモデル"""
+
+    ranking_score: float = Field(..., ge=0.0, le=1.0, description="ランキングスコア")
+    popularity_score: float = Field(..., ge=0.0, le=1.0, description="人気度スコア")
+    difficulty_score: float = Field(..., ge=0.0, le=1.0, description="難易度スコア")
+
+
+class KeywordSelectionResult(BaseModel):
+    """キーワード選定結果モデル"""
+
+    primary_keyword: str = Field(..., description="主要キーワード")
+    primary_score: float = Field(
+        ..., ge=0.0, le=1.0, description="主要キーワードスコア"
+    )
+    primary_ranking: int = Field(
+        ..., ge=1, le=1000, description="主要キーワードランキング"
+    )
+    primary_popularity: float = Field(
+        ..., ge=0.0, le=100.0, description="主要キーワード人気度"
+    )
+    primary_difficulty: float = Field(
+        ..., ge=0.0, le=100.0, description="主要キーワード難易度"
+    )
+    component_scores: ComponentScores = Field(..., description="要素スコア")
+    candidates: List[CandidateKeyword] = Field(..., description="候補キーワードリスト")
+    total_keywords_analyzed: int = Field(..., ge=1, description="分析対象キーワード数")
