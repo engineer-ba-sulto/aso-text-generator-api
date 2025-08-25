@@ -3,9 +3,16 @@ ASO Text Generator API - Main Application Entry Point
 """
 
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.utils.error_handler import (
+    aso_exception_handler,
+    general_exception_handler,
+    validation_exception_handler,
+)
+from app.utils.exceptions import ASOAPIException
 
 # FastAPIアプリケーションの初期化
 app = FastAPI(
@@ -23,6 +30,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# エラーハンドラーの登録
+app.add_exception_handler(ASOAPIException, aso_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, general_exception_handler)
 
 
 @app.get("/")
