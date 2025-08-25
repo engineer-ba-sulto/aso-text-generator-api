@@ -9,7 +9,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # Google AI設定
-    google_api_key: str
+    google_api_key: Optional[str] = None
 
     # Gemini API設定
     gemini_api_key: Optional[str] = None
