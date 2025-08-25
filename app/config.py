@@ -2,58 +2,34 @@
 Application Configuration Settings
 """
 
-import os
-from typing import List
+from typing import Optional
 
-from pydantic import BaseSettings, validator
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    """アプリケーション設定クラス"""
+    # Google AI設定
+    google_api_key: str
 
-    # プロジェクト基本情報
-    PROJECT_NAME: str = "ASO Text Generator API"
-    PROJECT_DESCRIPTION: str = "ASO最適化のためのテキスト生成API"
-    VERSION: str = "0.1.0"
+    # アプリケーション設定
+    app_name: str = "ASO Text Generator API"
+    app_version: str = "1.0.0"
+    debug: bool = False
 
-    # API設定
-    API_V1_STR: str = "/api/v1"
-    HOST: str = "0.0.0.0"
-    PORT: int = 8000
-
-    # 環境設定
-    DEBUG: bool = True
-    ENVIRONMENT: str = "development"
-
-    # CORS設定
-    ALLOWED_HOSTS: List[str] = ["*"]
-
-    # セキュリティ設定
-    SECRET_KEY: str = "your-secret-key-here"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-
-    # 外部API設定
-    GOOGLE_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-1.5-flash"
-
-    # データベース設定（将来的に使用）
-    DATABASE_URL: str = ""
+    # サーバー設定
+    host: str = "0.0.0.0"
+    port: int = 8000
 
     # ログ設定
-    LOG_LEVEL: str = "INFO"
+    log_level: str = "INFO"
 
-    @validator("ALLOWED_HOSTS", pre=True)
-    def assemble_cors_origins(cls, v):
-        """CORS設定の検証"""
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
-            return v
-        raise ValueError(v)
+    # ファイルアップロード設定
+    max_file_size: int = 10485760
+    allowed_extensions: str = ".csv"
 
     class Config:
         env_file = ".env"
-        case_sensitive = True
+        env_file_encoding = "utf-8"
 
 
 # グローバル設定インスタンス
