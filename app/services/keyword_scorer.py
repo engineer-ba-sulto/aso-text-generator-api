@@ -1,4 +1,5 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel
 
 import numpy as np
 
@@ -92,15 +93,28 @@ class KeywordScorer:
         return round(composite_score, 4)
 
 
-class ScoringResult:
+class ScoringResult(BaseModel):
     """スコアリング結果クラス"""
+    
+    keyword: str
+    ranking: int
+    popularity: float
+    difficulty: float
+    composite_score: float
+    ranking_score: Optional[float] = None
+    popularity_score: Optional[float] = None
+    difficulty_score: Optional[float] = None
 
-    def __init__(self, keyword_data: KeywordData, composite_score: float):
-        self.keyword_data = keyword_data
-        self.composite_score = composite_score
-        self.ranking_score = None
-        self.popularity_score = None
-        self.difficulty_score = None
+    @classmethod
+    def from_keyword_data(cls, keyword_data: KeywordData, composite_score: float):
+        """KeywordDataからScoringResultを作成"""
+        return cls(
+            keyword=keyword_data.keyword,
+            ranking=keyword_data.ranking,
+            popularity=keyword_data.popularity,
+            difficulty=keyword_data.difficulty,
+            composite_score=composite_score
+        )
 
     def set_component_scores(
         self, ranking_score: float, popularity_score: float, difficulty_score: float
@@ -134,7 +148,7 @@ class KeywordScoringService:
             composite_score = self.scorer.calculate_composite_score(keyword_data)
 
             # 結果オブジェクトを作成
-            result = ScoringResult(keyword_data, composite_score)
+            result = ScoringResult.from_keyword_data(keyword_data, composite_score)
 
             # 各要素スコアを設定
             ranking_score = self.scorer.calculate_ranking_score(keyword_data.ranking)

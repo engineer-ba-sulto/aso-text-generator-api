@@ -56,11 +56,11 @@ class PrimaryKeywordSelector:
 
             # 選定結果を構築
             selection_result = {
-                "primary_keyword": primary_result.keyword_data.keyword,
+                "primary_keyword": primary_result.keyword,
                 "primary_score": primary_result.composite_score,
-                "primary_ranking": primary_result.keyword_data.ranking,
-                "primary_popularity": primary_result.keyword_data.popularity,
-                "primary_difficulty": primary_result.keyword_data.difficulty,
+                "primary_ranking": primary_result.ranking,
+                "primary_popularity": primary_result.popularity,
+                "primary_difficulty": primary_result.difficulty,
                 "component_scores": {
                     "ranking_score": primary_result.ranking_score,
                     "popularity_score": primary_result.popularity_score,
@@ -71,7 +71,7 @@ class PrimaryKeywordSelector:
             }
 
             logger.info(
-                f"主要キーワードを選定しました: {primary_result.keyword_data.keyword} (スコア: {primary_result.composite_score})"
+                f"主要キーワードを選定しました: {primary_result.keyword} (スコア: {primary_result.composite_score})"
             )
 
             return selection_result
@@ -98,11 +98,11 @@ class PrimaryKeywordSelector:
         for i, result in enumerate(top_results):
             candidate = {
                 "rank": i + 1,
-                "keyword": result.keyword_data.keyword,
+                "keyword": result.keyword,
                 "score": result.composite_score,
-                "ranking": result.keyword_data.ranking,
-                "popularity": result.keyword_data.popularity,
-                "difficulty": result.keyword_data.difficulty,
+                "ranking": result.ranking,
+                "popularity": result.popularity,
+                "difficulty": result.difficulty,
             }
             candidates.append(candidate)
 

@@ -13,8 +13,9 @@ logger = logging.getLogger(__name__)
 
 async def aso_exception_handler(request: Request, exc: ASOAPIException):
     error_response = ErrorResponse(
+        error=exc.message,
         error_code=exc.error_code,
-        message=exc.message,
+        detail=exc.message,
         timestamp=datetime.utcnow(),
         path=request.url.path,
     )
@@ -24,9 +25,9 @@ async def aso_exception_handler(request: Request, exc: ASOAPIException):
 
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     error_response = ErrorResponse(
+        error="Request validation failed",
         error_code="VALIDATION_ERROR",
-        message="Request validation failed",
-        details=exc.errors(),
+        detail=str(exc.errors()),
         timestamp=datetime.utcnow(),
         path=request.url.path,
     )
@@ -38,8 +39,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 async def general_exception_handler(request: Request, exc: Exception):
     error_response = ErrorResponse(
+        error="An unexpected error occurred",
         error_code="INTERNAL_SERVER_ERROR",
-        message="An unexpected error occurred",
+        detail=str(exc),
         timestamp=datetime.utcnow(),
         path=request.url.path,
     )
