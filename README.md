@@ -75,7 +75,10 @@ python3 -m venv venv
 
 # 仮想環境のアクティベート
 # macOS/Linux
+# bash
 source venv/bin/activate
+# fish
+source venv/bin/activate.fish
 # Windows
 venv\Scripts\activate
 ```
@@ -127,7 +130,7 @@ ALLOWED_EXTENSIONS=".csv"
 
 ```bash
 # 直接実行
-python -m app.main
+python3 -m app.main
 
 # または uvicorn を使用
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
