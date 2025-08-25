@@ -10,6 +10,7 @@ from app.services.keyword_field_generator import KeywordFieldGenerationService
 from app.services.subtitle_generator import SubtitleGenerator
 from app.services.title_generator import TitleGenerationService
 from app.services.whats_new_generator import WhatsNewGenerationService
+from app.services.description_generator import DescriptionGenerator
 
 
 class TextGenerator:
@@ -22,6 +23,7 @@ class TextGenerator:
         self.title_service = TitleGenerationService()
         self.whats_new_service = WhatsNewGenerationService()
         self.subtitle_generator = SubtitleGenerator(self.gemini_generator)
+        self.description_generator = DescriptionGenerator(self.gemini_generator)
 
     def generate_title(self, keywords: List[str], app_info: Dict[str, Any]) -> str:
         """
@@ -75,19 +77,23 @@ class TextGenerator:
         return self.subtitle_generator.generate_subtitle(app_info, main_keyword, language)
 
     def generate_description(
-        self, keywords: List[str], app_info: Dict[str, Any]
+        self,
+        app_info: Dict[str, Any],
+        main_keyword: str,
+        language: str = "ja"
     ) -> str:
         """
-        アプリ説明文を生成する
+        概要を生成する
 
         Args:
-            keywords: キーワードのリスト
-            app_info: アプリ情報の辞書
+            app_info: アプリ情報（名前、特徴、ターゲットユーザー、機能など）
+            main_keyword: 主要キーワード（4〜7回含める対象）
+            language: 生成言語（"ja" or "en"）
 
         Returns:
-            生成された説明文
+            生成された概要（4,000文字以内）
         """
-        pass
+        return self.description_generator.generate_description(app_info, main_keyword, language)
 
     def generate_whats_new(
         self,
