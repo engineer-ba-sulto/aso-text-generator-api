@@ -47,6 +47,7 @@ venv\Scripts\activate
 ### 3. 依存関係のインストール
 
 ```bash
+# すべての依存関係をインストール（本番・開発用含む）
 pip install -r requirements.txt
 ```
 

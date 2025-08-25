@@ -55,9 +55,7 @@
 
 #### 影響/変更ファイル
 
-- 追加:
-  - `requirements.txt`
-  - `requirements-dev.txt`（開発用パッケージ）
+- 追加:`requirements.txt`
 - 変更: なし
 
 #### 依存関係 / ブロッカー
