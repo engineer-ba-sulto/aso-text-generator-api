@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.aso_endpoints import router as aso_router
 from app.config import settings
+from app.services.aso_text_orchestrator import ASOTextOrchestrator
 from app.services.csv_analyzer import CSVAnalyzer
 from app.services.description_generator import DescriptionGenerator
 from app.services.gemini_generator import GeminiGenerator
@@ -79,6 +80,10 @@ def get_whats_new_generator():
 
 def get_gemini_generator():
     return GeminiGenerator()
+
+
+def get_orchestrator():
+    return ASOTextOrchestrator()
 
 
 # APIルーターの登録
