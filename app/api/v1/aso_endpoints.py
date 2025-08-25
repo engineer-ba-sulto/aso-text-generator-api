@@ -18,6 +18,7 @@ from app.models.request_models import (
 from app.models.response_models import (
     ASOResponse,
     ASOTextGenerationResponse,
+    CSVAnalysisResponse,
     DescriptionResponse,
     KeywordFieldResponse,
     SubtitleResponse,
@@ -404,8 +405,11 @@ async def generate_whats_new_orchestrated(
         )
 
 
-@router.post("/analyze-csv", response_model=Dict[str, Any])
-async def analyze_csv(file: UploadFile = File(...)):
+@router.post("/analyze-csv", response_model=CSVAnalysisResponse)
+async def analyze_csv(
+    file: UploadFile = File(...),
+    csv_analyzer: CSVAnalyzer = Depends(get_csv_analyzer),
+):
     """
     CSVファイルを分析するエンドポイント
 
@@ -415,7 +419,39 @@ async def analyze_csv(file: UploadFile = File(...)):
     Returns:
         分析結果
     """
-    pass
+    try:
+        # ファイル拡張子の確認
+        if not file.filename.endswith(".csv"):
+            raise HTTPException(
+                status_code=400, detail="CSVファイルのみアップロード可能です"
+            )
+
+        # 一時ファイルとして保存
+        import os
+        import tempfile
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as temp_file:
+            content = await file.read()
+            temp_file.write(content)
+            temp_file_path = temp_file.name
+
+        try:
+            # CSV分析を実行
+            analysis_result = csv_analyzer.analyze_csv(temp_file_path)
+
+            return CSVAnalysisResponse(
+                success=True, data=analysis_result, message="CSV分析が完了しました"
+            )
+
+        finally:
+            # 一時ファイルを削除
+            if os.path.exists(temp_file_path):
+                os.unlink(temp_file_path)
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"CSV分析中にエラーが発生しました: {str(e)}"
+        )
 
 
 @router.post("/generate-text", response_model=ASOResponse)
