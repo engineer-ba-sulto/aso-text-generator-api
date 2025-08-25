@@ -46,6 +46,18 @@ class KeywordFieldResponse(BaseModel):
     generated_at: str = Field(..., description="生成日時")
 
 
+class TitleResponse(BaseModel):
+    """タイトル生成レスポンスモデル"""
+    
+    success: bool = Field(..., description="処理成功フラグ")
+    title: str = Field(..., description="生成されたタイトル")
+    length: int = Field(..., description="タイトルの文字数")
+    primary_keyword: str = Field(..., description="主要キーワード")
+    app_base_name: str = Field(..., description="アプリ基本名")
+    language: str = Field(..., description="言語")
+    generated_at: str = Field(..., description="生成日時")
+
+
 class ErrorResponse(BaseModel):
     """エラーレスポンスモデル"""
     

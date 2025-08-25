@@ -6,6 +6,7 @@ ASOテキストの生成を行うサービス
 from typing import Any, Dict, List
 
 from app.services.keyword_field_generator import KeywordFieldGenerationService
+from app.services.title_generator import TitleGenerationService
 
 
 class TextGenerator:
@@ -14,6 +15,7 @@ class TextGenerator:
     def __init__(self):
         """初期化"""
         self.keyword_field_service = KeywordFieldGenerationService()
+        self.title_service = TitleGenerationService()
 
     def generate_title(self, keywords: List[str], app_info: Dict[str, Any]) -> str:
         """
@@ -27,6 +29,25 @@ class TextGenerator:
             生成されたタイトル
         """
         pass
+
+    def generate_title_from_keyword(
+        self,
+        primary_keyword: str,
+        app_base_name: str,
+        language: str = "ja"
+    ) -> Dict[str, Any]:
+        """
+        主要キーワードとアプリ基本名からタイトルを生成する
+
+        Args:
+            primary_keyword: 主要キーワード
+            app_base_name: アプリ基本名
+            language: 言語
+
+        Returns:
+            生成されたタイトル
+        """
+        return self.title_service.generate_title(primary_keyword, app_base_name, language)
 
     def generate_description(
         self, keywords: List[str], app_info: Dict[str, Any]
