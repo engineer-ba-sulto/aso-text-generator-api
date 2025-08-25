@@ -16,22 +16,54 @@ from app.config import settings
 class GeminiGenerator:
     """Gemini API連携クラス"""
 
-    def __init__(self, api_key: str = None):
+    def __init__(self, api_key: str = None, model_name: str = None):
         """
         初期化
 
         Args:
             api_key: Gemini APIキー
+            model_name: 使用するモデル名（指定しない場合は設定ファイルから取得）
         """
         self.api_key = api_key or settings.gemini_api_key or settings.google_api_key
         if not self.api_key:
             raise ValueError("Gemini API key is required")
 
+        # モデル名の検証と設定
+        self.model_name = model_name or settings.gemini_model
+        self._validate_model(self.model_name)
+
         # Gemini API設定
         self.client = genai.Client(api_key=self.api_key)
-        self.model_name = settings.gemini_model
         self.timeout = settings.gemini_timeout
         self.max_retries = settings.gemini_max_retries
+
+    def _validate_model(self, model_name: str) -> None:
+        """
+        モデル名の検証
+
+        Args:
+            model_name: 検証するモデル名
+
+        Raises:
+            ValueError: 非推奨モデルまたは無効なモデルが指定された場合
+        """
+        if not settings.is_valid_model(model_name):
+            category = settings.get_model_category(model_name)
+            if category == "deprecated":
+                raise ValueError(
+                    f"非推奨モデル '{model_name}' は使用できません。"
+                    f"推奨モデル: {settings.RECOMMENDED_MODELS}, "
+                    f"許容モデル: {settings.ACCEPTABLE_MODELS}"
+                )
+            else:
+                raise ValueError(
+                    f"無効なモデル '{model_name}' が指定されました。"
+                    f"利用可能なモデル: {settings.available_models}"
+                )
+
+        logger.info(
+            f"使用モデル: {model_name} (カテゴリ: {settings.get_model_category(model_name)})"
+        )
 
     def generate_subtitle(self, prompt: str, language: str = "ja") -> str:
         """

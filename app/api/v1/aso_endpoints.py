@@ -7,6 +7,7 @@ from typing import Any, Dict, List
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
+from app.config import settings
 from app.models.request_models import (
     ASORequest,
     ASOTextGenerationRequest,
@@ -74,6 +75,13 @@ def get_description_generator() -> DescriptionGenerator:
     return DescriptionGenerator(gemini_generator)
 
 
+def create_gemini_generator(model_name: str = None) -> GeminiGenerator:
+    """指定されたモデルでGeminiGeneratorを作成"""
+    from app.services.gemini_generator import GeminiGenerator
+
+    return GeminiGenerator(model_name=model_name)
+
+
 def get_whats_new_generator() -> WhatsNewGenerator:
     return WhatsNewGenerator()
 
@@ -84,6 +92,26 @@ def get_response_builder() -> ResponseBuilder:
 
 def get_individual_text_orchestrator() -> IndividualTextOrchestrator:
     return IndividualTextOrchestrator()
+
+
+@router.get("/models", response_model=Dict[str, List[str]])
+async def get_available_models():
+    """
+    利用可能なGeminiモデルの一覧を取得するエンドポイント
+
+    Returns:
+        推奨モデルと許容モデルのリスト
+    """
+    return {
+        "recommended_models": settings.RECOMMENDED_MODELS,
+        "acceptable_models": settings.ACCEPTABLE_MODELS,
+        "current_default": settings.gemini_model,
+        "model_categories": {
+            "recommended": "最新の推奨モデル（最高性能）",
+            "acceptable": "許容モデル（明示的に要求された場合のみ使用）",
+            "deprecated": "非推奨モデル（使用禁止）",
+        },
+    }
 
 
 @router.post("/generate-aso-texts", response_model=ASOTextGenerationResponse)

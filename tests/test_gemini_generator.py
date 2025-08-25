@@ -26,7 +26,34 @@ class TestGeminiGenerator:
         with patch("app.services.gemini_generator.settings") as mock_settings:
             mock_settings.gemini_api_key = None
             mock_settings.google_api_key = "test_api_key"
-            mock_settings.gemini_model = "gemini-pro"
+            mock_settings.gemini_model = "gemini-2.5-flash"
+            mock_settings.RECOMMENDED_MODELS = ["gemini-2.5-flash", "gemini-2.5-pro"]
+            mock_settings.ACCEPTABLE_MODELS = ["gemini-2.0-flash", "gemini-2.0-pro"]
+            mock_settings.DEPRECATED_MODELS = [
+                "gemini-1.5-flash",
+                "gemini-1.5-pro",
+                "gemini-pro",
+            ]
+            mock_settings.available_models = [
+                "gemini-2.5-flash",
+                "gemini-2.5-pro",
+                "gemini-2.0-flash",
+                "gemini-2.0-pro",
+            ]
+            mock_settings.is_valid_model = lambda x: x in mock_settings.available_models
+            mock_settings.get_model_category = lambda x: (
+                "recommended"
+                if x in mock_settings.RECOMMENDED_MODELS
+                else (
+                    "acceptable"
+                    if x in mock_settings.ACCEPTABLE_MODELS
+                    else (
+                        "deprecated"
+                        if x in mock_settings.DEPRECATED_MODELS
+                        else "unknown"
+                    )
+                )
+            )
             mock_settings.gemini_timeout = 30
             mock_settings.gemini_max_retries = 3
             yield mock_settings
@@ -46,7 +73,23 @@ class TestGeminiGenerator:
         """APIキーなしで初期化するテスト"""
         generator = GeminiGenerator()
         assert generator.api_key == "test_api_key"
+        assert generator.model_name == "gemini-2.5-flash"
         mock_genai.Client.assert_called_once_with(api_key="test_api_key")
+
+    def test_init_with_custom_model(self, mock_genai, mock_settings):
+        """カスタムモデルでの初期化テスト"""
+        generator = GeminiGenerator(model_name="gemini-2.5-pro")
+        assert generator.model_name == "gemini-2.5-pro"
+
+    def test_init_with_deprecated_model(self, mock_genai, mock_settings):
+        """非推奨モデルでの初期化テスト（エラー）"""
+        with pytest.raises(ValueError, match="非推奨モデル"):
+            GeminiGenerator(model_name="gemini-pro")
+
+    def test_init_with_invalid_model(self, mock_genai, mock_settings):
+        """無効なモデルでの初期化テスト（エラー）"""
+        with pytest.raises(ValueError, match="無効なモデル"):
+            GeminiGenerator(model_name="invalid-model")
 
     def test_init_no_api_key_available(self, mock_genai, mock_settings):
         """APIキーが利用できない場合のテスト"""
