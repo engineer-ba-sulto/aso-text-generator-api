@@ -3,13 +3,15 @@
 キーワードの選定と優先度付けを行うサービス
 """
 
-from typing import List, Optional, Dict, Any
-from app.services.keyword_scorer import ScoringResult, KeywordScoringService
-from app.models.csv_models import KeywordData
-from app.utils.exceptions import KeywordSelectionError
 import logging
+from typing import Any, Dict, List, Optional
+
+from app.models.csv_models import KeywordData
+from app.services.keyword_scorer import KeywordScoringService, ScoringResult
+from app.utils.exceptions import KeywordSelectionError
 
 logger = logging.getLogger(__name__)
+
 
 class PrimaryKeywordSelector:
     """主要キーワード選定クラス"""
@@ -47,26 +49,30 @@ class PrimaryKeywordSelector:
 
             # スコア閾値チェック
             if primary_result.composite_score < self.min_score_threshold:
-                logger.warning(f"最高スコアが閾値を下回っています: {primary_result.composite_score}")
+                logger.warning(
+                    f"最高スコアが閾値を下回っています: {primary_result.composite_score}"
+                )
                 # 閾値を下回る場合は警告を出すが、処理は継続
 
             # 選定結果を構築
             selection_result = {
-                'primary_keyword': primary_result.keyword_data.keyword,
-                'primary_score': primary_result.composite_score,
-                'primary_ranking': primary_result.keyword_data.ranking,
-                'primary_popularity': primary_result.keyword_data.popularity,
-                'primary_difficulty': primary_result.keyword_data.difficulty,
-                'component_scores': {
-                    'ranking_score': primary_result.ranking_score,
-                    'popularity_score': primary_result.popularity_score,
-                    'difficulty_score': primary_result.difficulty_score
+                "primary_keyword": primary_result.keyword_data.keyword,
+                "primary_score": primary_result.composite_score,
+                "primary_ranking": primary_result.keyword_data.ranking,
+                "primary_popularity": primary_result.keyword_data.popularity,
+                "primary_difficulty": primary_result.keyword_data.difficulty,
+                "component_scores": {
+                    "ranking_score": primary_result.ranking_score,
+                    "popularity_score": primary_result.popularity_score,
+                    "difficulty_score": primary_result.difficulty_score,
                 },
-                'candidates': self._get_top_candidates(scoring_results),
-                'total_keywords_analyzed': len(keywords)
+                "candidates": self._get_top_candidates(scoring_results),
+                "total_keywords_analyzed": len(keywords),
             }
 
-            logger.info(f"主要キーワードを選定しました: {primary_result.keyword_data.keyword} (スコア: {primary_result.composite_score})")
+            logger.info(
+                f"主要キーワードを選定しました: {primary_result.keyword_data.keyword} (スコア: {primary_result.composite_score})"
+            )
 
             return selection_result
 
@@ -74,7 +80,9 @@ class PrimaryKeywordSelector:
             logger.error(f"主要キーワード選定中にエラーが発生しました: {str(e)}")
             raise KeywordSelectionError(f"主要キーワード選定に失敗しました: {str(e)}")
 
-    def _get_top_candidates(self, scoring_results: List[ScoringResult]) -> List[Dict[str, Any]]:
+    def _get_top_candidates(
+        self, scoring_results: List[ScoringResult]
+    ) -> List[Dict[str, Any]]:
         """
         上位候補キーワードを取得
 
@@ -85,16 +93,16 @@ class PrimaryKeywordSelector:
             上位候補のリスト
         """
         candidates = []
-        top_results = scoring_results[:self.max_keywords_to_consider]
+        top_results = scoring_results[: self.max_keywords_to_consider]
 
         for i, result in enumerate(top_results):
             candidate = {
-                'rank': i + 1,
-                'keyword': result.keyword_data.keyword,
-                'score': result.composite_score,
-                'ranking': result.keyword_data.ranking,
-                'popularity': result.keyword_data.popularity,
-                'difficulty': result.keyword_data.difficulty
+                "rank": i + 1,
+                "keyword": result.keyword_data.keyword,
+                "score": result.composite_score,
+                "ranking": result.keyword_data.ranking,
+                "popularity": result.keyword_data.popularity,
+                "difficulty": result.keyword_data.difficulty,
             }
             candidates.append(candidate)
 
@@ -107,7 +115,7 @@ class KeywordSelectionValidator:
     def __init__(self):
         self.min_keyword_length = 2  # 最小キーワード長
         self.max_keyword_length = 50  # 最大キーワード長
-        self.forbidden_chars = ['<', '>', '&', '"', "'"]  # 禁止文字
+        self.forbidden_chars = ["<", ">", "&", '"', "'"]  # 禁止文字
 
     def validate_primary_keyword(self, keyword: str) -> bool:
         """
@@ -129,7 +137,9 @@ class KeywordSelectionValidator:
         # 禁止文字チェック
         for char in self.forbidden_chars:
             if char in keyword:
-                raise KeywordSelectionError(f"キーワードに禁止文字が含まれています: {char}")
+                raise KeywordSelectionError(
+                    f"キーワードに禁止文字が含まれています: {char}"
+                )
 
         # 空白文字チェック
         if keyword.strip() != keyword:
@@ -148,8 +158,12 @@ class KeywordSelectionValidator:
             妥当性チェック結果
         """
         required_fields = [
-            'primary_keyword', 'primary_score', 'primary_ranking',
-            'primary_popularity', 'primary_difficulty', 'candidates'
+            "primary_keyword",
+            "primary_score",
+            "primary_ranking",
+            "primary_popularity",
+            "primary_difficulty",
+            "candidates",
         ]
 
         for field in required_fields:
@@ -157,11 +171,13 @@ class KeywordSelectionValidator:
                 raise KeywordSelectionError(f"必須フィールドが不足しています: {field}")
 
         # 主要キーワードの妥当性を検証
-        self.validate_primary_keyword(result['primary_keyword'])
+        self.validate_primary_keyword(result["primary_keyword"])
 
         # スコアの妥当性を検証
-        if not (0 <= result['primary_score'] <= 1):
-            raise KeywordSelectionError(f"スコアが不正な値です: {result['primary_score']}")
+        if not (0 <= result["primary_score"] <= 1):
+            raise KeywordSelectionError(
+                f"スコアが不正な値です: {result['primary_score']}"
+            )
 
         return True
 
@@ -209,12 +225,12 @@ class KeywordSelectionService:
         Returns:
             サマリーテキスト
         """
-        primary = result['primary_keyword']
-        score = result['primary_score']
-        ranking = result['primary_ranking']
-        popularity = result['primary_popularity']
-        difficulty = result['primary_difficulty']
-        total = result['total_keywords_analyzed']
+        primary = result["primary_keyword"]
+        score = result["primary_score"]
+        ranking = result["primary_ranking"]
+        popularity = result["primary_popularity"]
+        difficulty = result["primary_difficulty"]
+        total = result["total_keywords_analyzed"]
 
         summary = (
             f"主要キーワード: {primary}\n"
@@ -226,3 +242,7 @@ class KeywordSelectionService:
         )
 
         return summary
+
+
+# 後方互換性のためのエイリアス
+KeywordSelector = KeywordSelectionService
