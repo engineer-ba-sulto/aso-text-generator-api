@@ -32,3 +32,29 @@ class CSVData(BaseModel):
         if len(keywords) != len(set(keywords)):
             raise ValueError("重複するキーワードが存在します")
         return v
+
+
+class PydanticScoringResult(BaseModel):
+    """スコアリング結果モデル"""
+
+    keyword_data: KeywordData
+    composite_score: float = Field(..., ge=0.0, le=1.0, description="複合スコア（0-1）")
+    ranking_score: Optional[float] = Field(
+        None, ge=0.0, le=1.0, description="ランキングスコア（0-1）"
+    )
+    popularity_score: Optional[float] = Field(
+        None, ge=0.0, le=1.0, description="人気度スコア（0-1）"
+    )
+    difficulty_score: Optional[float] = Field(
+        None, ge=0.0, le=1.0, description="難易度スコア（0-1）"
+    )
+
+
+class ScoringResults(BaseModel):
+    """スコアリング結果リストモデル"""
+
+    results: List[PydanticScoringResult] = Field(
+        ..., min_length=1, description="スコアリング結果のリスト"
+    )
+    total_count: int = Field(..., ge=1, description="総キーワード数")
+    average_score: float = Field(..., ge=0.0, le=1.0, description="平均スコア")
