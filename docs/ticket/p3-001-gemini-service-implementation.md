@@ -9,7 +9,7 @@
 
 1. **Gemini API 連携の実装**
 
-   - `google-generativeai`ライブラリを使用した API 連携
+   - `google-genai`ライブラリを使用した API 連携
    - API キー管理と環境変数からの読み込み
    - モデル選択（Gemini Pro）の実装
 
@@ -63,7 +63,7 @@ class GeminiGenerator:
 
 **設定項目:**
 
-- API キー: 環境変数`GEMINI_API_KEY`から読み込み
+- API キー: 環境変数`GOOGLE_API_KEY`から読み込み
 - モデル: `gemini-pro`
 - タイムアウト: 30 秒
 - 最大リトライ回数: 3 回
@@ -80,7 +80,7 @@ class GeminiGenerator:
 
 #### 依存関係 / ブロッカー
 
-- **依存**: `google-generativeai`ライブラリのインストール
+- **依存**: `google-genai`ライブラリのインストール
 - **ブロッカー**: Google AI (Gemini) API キーの取得
 - **後続**: P3-002（多言語プロンプト管理）は本チケットの完了に依存
 
@@ -88,13 +88,13 @@ class GeminiGenerator:
 
 1. **環境設定**
 
-   - `requirements.txt`に`google-generativeai`を追加
+   - `requirements.txt`に`google-genai`を追加
    - `.env`ファイルに Gemini API キー設定を追加
    - `app/config.py`に Gemini 設定を追加
 
 2. **Gemini API 連携実装**
 
-   - `google-generativeai`ライブラリを使用した API 呼び出し
+   - `google-genai`ライブラリを使用した API 呼び出し
    - モデル初期化と設定
    - 基本的なテキスト生成機能
 
@@ -123,7 +123,7 @@ class GeminiGenerator:
 
 #### 参考資料
 
-- [Google Generative AI Python SDK](https://ai.google.dev/tutorials/python_quickstart)
+- [Google GenAI Python SDK](https://ai.google.dev/tutorials/python_quickstart)
 - [Gemini API リファレンス](https://ai.google.dev/api/gemini-api)
 - [Gemini Pro モデル仕様](https://ai.google.dev/models/gemini)
 
