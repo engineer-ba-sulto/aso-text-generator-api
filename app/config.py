@@ -22,9 +22,18 @@ class Settings(BaseSettings):
     app_version: str = "1.0.0"
     debug: bool = False
 
+    # FastAPI設定
+    project_name: str = "ASO Text Generator API"
+    project_description: str = "App Store Optimization用のテキスト生成API"
+    version: str = "1.0.0"
+    api_v1_str: str = "/api/v1"
+
     # サーバー設定
     host: str = "0.0.0.0"
     port: int = 8000
+
+    # CORS設定
+    allowed_hosts: list = ["*"]
 
     # ログ設定
     log_level: str = "INFO"
