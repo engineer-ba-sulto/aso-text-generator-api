@@ -4,7 +4,7 @@
 """
 
 import re
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from loguru import logger
 
@@ -71,6 +71,26 @@ class DescriptionGenerator:
         except Exception as e:
             logger.error(f"Error generating description: {e}")
             raise
+
+    def generate(
+        self,
+        primary_keyword: str,
+        features: List[str],
+        language: str = "ja"
+    ) -> str:
+        """
+        統合エンドポイント用の概要生成メソッド
+        
+        Args:
+            primary_keyword: 主要キーワード
+            features: アプリの特徴
+            language: 言語
+            
+        Returns:
+            生成された概要
+        """
+        app_info = {"features": features}
+        return self.generate_description(app_info, primary_keyword, language)
 
     def _prepare_prompt(
         self, app_info: Dict[str, Any], main_keyword: str, language: str

@@ -21,6 +21,11 @@ class TextGenerationError(ASOAPIException):
         super().__init__(message, "TEXT_GENERATION_ERROR", 500)
 
 
+class ASOTextGenerationError(ASOAPIException):
+    def __init__(self, message: str):
+        super().__init__(message, "ASO_TEXT_GENERATION_ERROR", 500)
+
+
 class GeminiAPIError(ASOAPIException):
     def __init__(self, message: str):
         super().__init__(message, "GEMINI_API_ERROR", 503)

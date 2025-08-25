@@ -59,6 +59,26 @@ class SubtitleGenerator:
             logger.error(f"Error generating subtitle: {e}")
             raise
 
+    def generate(
+        self,
+        primary_keyword: str,
+        features: List[str],
+        language: str = "ja"
+    ) -> str:
+        """
+        統合エンドポイント用のサブタイトル生成メソッド
+        
+        Args:
+            primary_keyword: 主要キーワード
+            features: アプリの特徴
+            language: 言語
+            
+        Returns:
+            生成されたサブタイトル
+        """
+        app_info = {"features": features}
+        return self.generate_subtitle(app_info, primary_keyword, language)
+
     def _prepare_prompt(self, app_info: dict, main_keyword: str, language: str) -> str:
         """
         プロンプトを準備する

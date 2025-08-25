@@ -296,3 +296,22 @@ class KeywordFieldGenerationService:
             raise TextGenerationError(
                 f"キーワードフィールド生成に失敗しました: {str(e)}"
             )
+
+    def generate(
+        self,
+        keywords_data: List[Dict[str, Any]],
+        primary_keyword: str,
+        language: str = "ja",
+    ) -> str:
+        """
+        統合エンドポイント用のキーワードフィールド生成メソッド
+
+        Args:
+            keywords_data: キーワードデータ
+            primary_keyword: 主要キーワード
+            language: 言語
+
+        Returns:
+            生成されたキーワードフィールド
+        """
+        return self.generate_keyword_field(primary_keyword, keywords_data, language)
