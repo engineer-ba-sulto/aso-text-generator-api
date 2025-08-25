@@ -3,6 +3,7 @@
 APIレスポンスのデータモデル定義
 """
 
+from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 
@@ -68,6 +69,18 @@ class WhatsNewResponse(BaseModel):
     keyword_occurrences: int = Field(..., description="キーワード出現回数")
     language: str = Field(..., description="言語")
     generated_at: str = Field(..., description="生成日時")
+
+
+class ASOTextGenerationResponse(BaseModel):
+    """統合ASOテキスト生成レスポンスモデル"""
+    
+    keyword_field: str = Field(..., description="キーワードフィールド (100文字)")
+    title: str = Field(..., description="タイトル (30文字)")
+    subtitle: str = Field(..., description="サブタイトル (30文字)")
+    description: str = Field(..., description="概要 (4000文字)")
+    whats_new: str = Field(..., description="最新情報 (4000文字)")
+    language: str = Field(..., description="生成された言語")
+    generated_at: datetime = Field(default_factory=datetime.utcnow)
 
 
 class ErrorResponse(BaseModel):
