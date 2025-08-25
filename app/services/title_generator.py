@@ -3,11 +3,12 @@
 30文字以内のアプリタイトルを生成するサービス
 """
 
-from typing import List, Dict, Any, Optional
-from app.utils.exceptions import TextGenerationError
-from datetime import datetime
-import re
 import logging
+import re
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from app.utils.exceptions import TextGenerationError
 
 logger = logging.getLogger(__name__)
 
@@ -22,10 +23,7 @@ class TitleGenerator:
         self.max_app_name_length = 15  # 最大アプリ名長
 
     def generate_title(
-        self,
-        primary_keyword: str,
-        app_base_name: str,
-        language: str = "ja"
+        self, primary_keyword: str, app_base_name: str, language: str = "ja"
     ) -> str:
         """
         タイトルを生成
@@ -74,10 +72,14 @@ class TitleGenerator:
             raise TextGenerationError("アプリ基本名が空です")
 
         if len(primary_keyword) > self.max_length:
-            raise TextGenerationError(f"主要キーワードが長すぎます: {len(primary_keyword)}文字")
+            raise TextGenerationError(
+                f"主要キーワードが長すぎます: {len(primary_keyword)}文字"
+            )
 
         if len(app_base_name) > self.max_length:
-            raise TextGenerationError(f"アプリ基本名が長すぎます: {len(app_base_name)}文字")
+            raise TextGenerationError(
+                f"アプリ基本名が長すぎます: {len(app_base_name)}文字"
+            )
 
         return True
 
@@ -125,7 +127,9 @@ class TitleGenerator:
         """全角文字を半角に変換"""
         # 全角英数字を半角に変換
         fullwidth_chars = "０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ"
-        halfwidth_chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        halfwidth_chars = (
+            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        )
 
         conversion_table = str.maketrans(fullwidth_chars, halfwidth_chars)
         return text.translate(conversion_table)
@@ -145,12 +149,12 @@ class TitleGenerator:
     def _remove_special_chars(self, text: str) -> str:
         """特殊文字を除去"""
         # 禁止文字を除去
-        forbidden_chars = ['<', '>', '&', '"', "'", '\\', '/', '|', '*', '?', ':', ';']
+        forbidden_chars = ["<", ">", "&", '"', "'", "\\", "/", "|", "*", "?", ":", ";"]
         for char in forbidden_chars:
-            text = text.replace(char, '')
+            text = text.replace(char, "")
 
         # 連続する空白を単一の空白に
-        text = re.sub(r'\s+', ' ', text)
+        text = re.sub(r"\s+", " ", text)
 
         return text.strip()
 
@@ -161,7 +165,7 @@ class TitleGenerator:
 
         # 単語境界で切り詰め
         truncated = app_name[:max_length]
-        last_space = truncated.rfind(' ')
+        last_space = truncated.rfind(" ")
 
         if last_space > 0:
             return truncated[:last_space]
@@ -170,10 +174,7 @@ class TitleGenerator:
 
     def _get_separator(self, language: str) -> str:
         """言語に応じた区切り文字を取得"""
-        separators = {
-            "ja": " - ",
-            "en": " - "
-        }
+        separators = {"ja": " - ", "en": " - "}
         return separators.get(language, self.separator)
 
     def _build_title(self, keyword: str, separator: str, app_name: str) -> str:
@@ -190,7 +191,7 @@ class TitleGenerator:
                 title = f"{keyword}{separator}{app_name}"
             else:
                 # キーワードのみでタイトルを構築
-                title = keyword[:self.max_length]
+                title = keyword[: self.max_length]
 
         return title
 
@@ -203,7 +204,7 @@ class TitleGenerator:
             raise TextGenerationError(f"タイトルが長すぎます: {len(title)}文字")
 
         # 禁止文字のチェック
-        forbidden_chars = ['<', '>', '&', '"', "'"]
+        forbidden_chars = ["<", ">", "&", '"', "'"]
         for char in forbidden_chars:
             if char in title:
                 raise TextGenerationError(f"タイトルに禁止文字が含まれています: {char}")
@@ -220,17 +221,19 @@ class MultilingualTitleProcessor:
                 "separator": " - ",
                 "max_keyword_length": 12,
                 "max_app_name_length": 15,
-                "case_sensitive": False
+                "case_sensitive": False,
             },
             "en": {
                 "separator": " - ",
                 "max_keyword_length": 15,
                 "max_app_name_length": 12,
-                "case_sensitive": True
-            }
+                "case_sensitive": True,
+            },
         }
 
-    def process_title_for_language(self, keyword: str, app_name: str, language: str) -> tuple[str, str]:
+    def process_title_for_language(
+        self, keyword: str, app_name: str, language: str
+    ) -> tuple[str, str]:
         """言語に応じたタイトル処理"""
         rules = self.language_rules.get(language, self.language_rules["en"])
 
@@ -248,7 +251,7 @@ class MultilingualTitleProcessor:
 
         # 長さ制限
         if len(processed) > rules["max_keyword_length"]:
-            processed = processed[:rules["max_keyword_length"]]
+            processed = processed[: rules["max_keyword_length"]]
 
         # 大文字小文字の処理
         if not rules["case_sensitive"]:
@@ -256,13 +259,15 @@ class MultilingualTitleProcessor:
 
         return processed
 
-    def _process_app_name_for_language(self, app_name: str, rules: Dict[str, Any]) -> str:
+    def _process_app_name_for_language(
+        self, app_name: str, rules: Dict[str, Any]
+    ) -> str:
         """言語に応じたアプリ名処理"""
         processed = app_name.strip()
 
         # 長さ制限
         if len(processed) > rules["max_app_name_length"]:
-            processed = processed[:rules["max_app_name_length"]]
+            processed = processed[: rules["max_app_name_length"]]
 
         # 大文字小文字の処理
         if rules["case_sensitive"]:
@@ -279,10 +284,7 @@ class TitleGenerationService:
         self.processor = MultilingualTitleProcessor()
 
     def generate_title(
-        self,
-        primary_keyword: str,
-        app_base_name: str,
-        language: str = "ja"
+        self, primary_keyword: str, app_base_name: str, language: str = "ja"
     ) -> Dict[str, Any]:
         """
         タイトルを生成（統合処理）
@@ -301,8 +303,10 @@ class TitleGenerationService:
                 raise TextGenerationError("主要キーワードまたはアプリ基本名が空です")
 
             # 言語に応じた処理
-            processed_keyword, processed_app_name = self.processor.process_title_for_language(
-                primary_keyword, app_base_name, language
+            processed_keyword, processed_app_name = (
+                self.processor.process_title_for_language(
+                    primary_keyword, app_base_name, language
+                )
             )
 
             # タイトルを生成
@@ -312,12 +316,12 @@ class TitleGenerationService:
 
             # 結果を構築
             result = {
-                'title': title,
-                'length': len(title),
-                'primary_keyword': primary_keyword,
-                'app_base_name': app_base_name,
-                'language': language,
-                'generated_at': datetime.now().isoformat()
+                "title": title,
+                "length": len(title),
+                "primary_keyword": primary_keyword,
+                "app_base_name": app_base_name,
+                "language": language,
+                "generated_at": datetime.now().isoformat(),
             }
 
             return result
@@ -325,3 +329,19 @@ class TitleGenerationService:
         except Exception as e:
             logger.error(f"タイトル生成サービスでエラーが発生しました: {str(e)}")
             raise TextGenerationError(f"タイトル生成に失敗しました: {str(e)}")
+
+    def generate(
+        self, primary_keyword: str, app_name: str, language: str = "ja"
+    ) -> str:
+        """
+        統合エンドポイント用のタイトル生成メソッド
+
+        Args:
+            primary_keyword: 主要キーワード
+            app_name: アプリ名
+            language: 言語
+
+        Returns:
+            生成されたタイトル
+        """
+        return self.generate_title(primary_keyword, app_name, language)

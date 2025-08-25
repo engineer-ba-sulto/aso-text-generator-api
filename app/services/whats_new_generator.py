@@ -479,3 +479,22 @@ class WhatsNewGenerationService:
         except Exception as e:
             logger.error(f"最新情報生成サービスでエラーが発生しました: {str(e)}")
             raise TextGenerationError(f"最新情報生成に失敗しました: {str(e)}")
+
+    def generate(
+        self,
+        features: List[str],
+        language: str = "ja"
+    ) -> str:
+        """
+        統合エンドポイント用の最新情報生成メソッド
+        
+        Args:
+            features: アプリの特徴
+            language: 言語
+            
+        Returns:
+            生成された最新情報
+        """
+        # 主要キーワードはfeaturesから自動抽出するか、デフォルト値を使用
+        primary_keyword = features[0] if features else "アプリ"
+        return self.generate_whats_new(primary_keyword, features, language)
