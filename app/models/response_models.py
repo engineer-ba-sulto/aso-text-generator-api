@@ -35,6 +35,17 @@ class KeywordSelectionResponse(BaseModel):
     reasoning: Optional[str] = Field(default=None, description="選定理由")
 
 
+class KeywordFieldResponse(BaseModel):
+    """キーワードフィールド生成レスポンスモデル"""
+    
+    success: bool = Field(..., description="処理成功フラグ")
+    keyword_field: str = Field(..., description="生成されたキーワードフィールド")
+    length: int = Field(..., description="キーワードフィールドの文字数")
+    primary_keyword: str = Field(..., description="主要キーワード")
+    language: str = Field(..., description="言語")
+    generated_at: str = Field(..., description="生成日時")
+
+
 class ErrorResponse(BaseModel):
     """エラーレスポンスモデル"""
     
