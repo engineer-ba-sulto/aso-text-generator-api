@@ -38,11 +38,58 @@ from app.utils.response_builder import ResponseBuilder
 router = APIRouter()
 
 
+# 依存性注入のファクトリ関数
+def get_aso_text_orchestrator() -> ASOTextOrchestrator:
+    return ASOTextOrchestrator()
+
+
+def get_csv_analyzer() -> CSVAnalyzer:
+    return CSVAnalyzer()
+
+
+def get_keyword_selector() -> KeywordSelector:
+    return KeywordSelector()
+
+
+def get_keyword_field_generator() -> KeywordFieldGenerator:
+    return KeywordFieldGenerator()
+
+
+def get_title_generator() -> TitleGenerator:
+    return TitleGenerator()
+
+
+def get_subtitle_generator() -> SubtitleGenerator:
+    from app.services.gemini_generator import GeminiGenerator
+
+    gemini_generator = GeminiGenerator()
+    return SubtitleGenerator(gemini_generator)
+
+
+def get_description_generator() -> DescriptionGenerator:
+    from app.services.gemini_generator import GeminiGenerator
+
+    gemini_generator = GeminiGenerator()
+    return DescriptionGenerator(gemini_generator)
+
+
+def get_whats_new_generator() -> WhatsNewGenerator:
+    return WhatsNewGenerator()
+
+
+def get_response_builder() -> ResponseBuilder:
+    return ResponseBuilder()
+
+
+def get_individual_text_orchestrator() -> IndividualTextOrchestrator:
+    return IndividualTextOrchestrator()
+
+
 @router.post("/generate-aso-texts", response_model=ASOTextGenerationResponse)
 async def generate_aso_texts(
     request: ASOTextGenerationRequest,
-    orchestrator: ASOTextOrchestrator = Depends(),
-    response_builder: ResponseBuilder = Depends(),
+    orchestrator: ASOTextOrchestrator = Depends(get_aso_text_orchestrator),
+    response_builder: ResponseBuilder = Depends(get_response_builder),
 ):
     """
     ASOテキストを一括生成するエンドポイント
@@ -80,10 +127,12 @@ async def generate_aso_texts(
 async def generate_keyword_field(
     csv_file: UploadFile = File(...),
     language: str = Form(...),
-    csv_analyzer: CSVAnalyzer = Depends(),
-    keyword_selector: KeywordSelector = Depends(),
-    keyword_field_generator: KeywordFieldGenerator = Depends(),
-    response_builder: ResponseBuilder = Depends(),
+    csv_analyzer: CSVAnalyzer = Depends(get_csv_analyzer),
+    keyword_selector: KeywordSelector = Depends(get_keyword_selector),
+    keyword_field_generator: KeywordFieldGenerator = Depends(
+        get_keyword_field_generator
+    ),
+    response_builder: ResponseBuilder = Depends(get_response_builder),
 ):
     """
     キーワードフィールド (100文字) を生成するエンドポイント
@@ -123,8 +172,8 @@ async def generate_keyword_field(
 @router.post("/generate-title", response_model=TitleResponse)
 async def generate_title(
     request: TitleRequest,
-    title_generator: TitleGenerator = Depends(),
-    response_builder: ResponseBuilder = Depends(),
+    title_generator: TitleGenerator = Depends(get_title_generator),
+    response_builder: ResponseBuilder = Depends(get_response_builder),
 ):
     """
     タイトル (30文字) を生成するエンドポイント
@@ -150,8 +199,8 @@ async def generate_title(
 @router.post("/generate-subtitle", response_model=SubtitleResponse)
 async def generate_subtitle(
     request: SubtitleRequest,
-    subtitle_generator: SubtitleGenerator = Depends(),
-    response_builder: ResponseBuilder = Depends(),
+    subtitle_generator: SubtitleGenerator = Depends(get_subtitle_generator),
+    response_builder: ResponseBuilder = Depends(get_response_builder),
 ):
     """
     サブタイトル (30文字) を生成するエンドポイント
@@ -178,8 +227,8 @@ async def generate_subtitle(
 @router.post("/generate-description", response_model=DescriptionResponse)
 async def generate_description(
     request: DescriptionRequest,
-    description_generator: DescriptionGenerator = Depends(),
-    response_builder: ResponseBuilder = Depends(),
+    description_generator: DescriptionGenerator = Depends(get_description_generator),
+    response_builder: ResponseBuilder = Depends(get_response_builder),
 ):
     """
     概要 (4,000文字) を生成するエンドポイント
@@ -205,8 +254,8 @@ async def generate_description(
 @router.post("/generate-whats-new", response_model=WhatsNewResponse)
 async def generate_whats_new(
     request: WhatsNewRequest,
-    whats_new_generator: WhatsNewGenerator = Depends(),
-    response_builder: ResponseBuilder = Depends(),
+    whats_new_generator: WhatsNewGenerator = Depends(get_whats_new_generator),
+    response_builder: ResponseBuilder = Depends(get_response_builder),
 ):
     """
     最新情報 (4,000文字) を生成するエンドポイント
@@ -238,8 +287,10 @@ async def generate_whats_new(
 async def generate_keyword_field_orchestrated(
     csv_file: UploadFile = File(...),
     language: str = Form(...),
-    orchestrator: IndividualTextOrchestrator = Depends(),
-    response_builder: ResponseBuilder = Depends(),
+    orchestrator: IndividualTextOrchestrator = Depends(
+        get_individual_text_orchestrator
+    ),
+    response_builder: ResponseBuilder = Depends(get_response_builder),
 ):
     """キーワードフィールド生成エンドポイント（オーケストレーター使用版）"""
     try:
@@ -259,8 +310,10 @@ async def generate_keyword_field_orchestrated(
 @router.post("/generate-title-orchestrated", response_model=TitleResponse)
 async def generate_title_orchestrated(
     request: TitleRequest,
-    orchestrator: IndividualTextOrchestrator = Depends(),
-    response_builder: ResponseBuilder = Depends(),
+    orchestrator: IndividualTextOrchestrator = Depends(
+        get_individual_text_orchestrator
+    ),
+    response_builder: ResponseBuilder = Depends(get_response_builder),
 ):
     """タイトル生成エンドポイント（オーケストレーター使用版）"""
     try:
@@ -281,8 +334,10 @@ async def generate_title_orchestrated(
 @router.post("/generate-subtitle-orchestrated", response_model=SubtitleResponse)
 async def generate_subtitle_orchestrated(
     request: SubtitleRequest,
-    orchestrator: IndividualTextOrchestrator = Depends(),
-    response_builder: ResponseBuilder = Depends(),
+    orchestrator: IndividualTextOrchestrator = Depends(
+        get_individual_text_orchestrator
+    ),
+    response_builder: ResponseBuilder = Depends(get_response_builder),
 ):
     """サブタイトル生成エンドポイント（オーケストレーター使用版）"""
     try:
@@ -304,8 +359,10 @@ async def generate_subtitle_orchestrated(
 @router.post("/generate-description-orchestrated", response_model=DescriptionResponse)
 async def generate_description_orchestrated(
     request: DescriptionRequest,
-    orchestrator: IndividualTextOrchestrator = Depends(),
-    response_builder: ResponseBuilder = Depends(),
+    orchestrator: IndividualTextOrchestrator = Depends(
+        get_individual_text_orchestrator
+    ),
+    response_builder: ResponseBuilder = Depends(get_response_builder),
 ):
     """概要生成エンドポイント（オーケストレーター使用版）"""
     try:
@@ -326,8 +383,10 @@ async def generate_description_orchestrated(
 @router.post("/generate-whats-new-orchestrated", response_model=WhatsNewResponse)
 async def generate_whats_new_orchestrated(
     request: WhatsNewRequest,
-    orchestrator: IndividualTextOrchestrator = Depends(),
-    response_builder: ResponseBuilder = Depends(),
+    orchestrator: IndividualTextOrchestrator = Depends(
+        get_individual_text_orchestrator
+    ),
+    response_builder: ResponseBuilder = Depends(get_response_builder),
 ):
     """最新情報生成エンドポイント（オーケストレーター使用版）"""
     try:

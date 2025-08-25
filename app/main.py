@@ -26,16 +26,16 @@ from app.utils.exceptions import ASOAPIException
 
 # FastAPIアプリケーションの初期化
 app = FastAPI(
-    title=settings.PROJECT_NAME,
-    description=settings.PROJECT_DESCRIPTION,
-    version=settings.VERSION,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    title=settings.project_name,
+    description=settings.project_description,
+    version=settings.version,
+    openapi_url=f"{settings.api_v1_str}/openapi.json",
 )
 
 # CORSミドルウェアの設定
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_HOSTS,
+    allow_origins=settings.allowed_hosts,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -87,7 +87,7 @@ def get_orchestrator():
 
 
 # APIルーターの登録
-app.include_router(aso_router, prefix=settings.API_V1_STR, tags=["aso"])
+app.include_router(aso_router, prefix=settings.api_v1_str, tags=["aso"])
 
 
 @app.get("/")
@@ -95,7 +95,7 @@ async def root():
     """ルートエンドポイント"""
     return {
         "message": "ASO Text Generator API",
-        "version": settings.VERSION,
+        "version": settings.version,
         "docs": "/docs",
     }
 
@@ -110,5 +110,5 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(
-        "app.main:app", host=settings.HOST, port=settings.PORT, reload=settings.DEBUG
+        "app.main:app", host=settings.host, port=settings.port, reload=settings.debug
     )
