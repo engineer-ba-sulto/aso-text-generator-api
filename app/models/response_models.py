@@ -58,6 +58,18 @@ class TitleResponse(BaseModel):
     generated_at: str = Field(..., description="生成日時")
 
 
+class WhatsNewResponse(BaseModel):
+    """最新情報生成レスポンスモデル"""
+    
+    success: bool = Field(..., description="処理成功フラグ")
+    whats_new: str = Field(..., description="生成された最新情報")
+    length: int = Field(..., description="最新情報の文字数")
+    primary_keyword: str = Field(..., description="主要キーワード")
+    keyword_occurrences: int = Field(..., description="キーワード出現回数")
+    language: str = Field(..., description="言語")
+    generated_at: str = Field(..., description="生成日時")
+
+
 class ErrorResponse(BaseModel):
     """エラーレスポンスモデル"""
     

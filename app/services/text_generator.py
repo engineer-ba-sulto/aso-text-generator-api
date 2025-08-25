@@ -7,6 +7,7 @@ from typing import Any, Dict, List
 
 from app.services.keyword_field_generator import KeywordFieldGenerationService
 from app.services.title_generator import TitleGenerationService
+from app.services.whats_new_generator import WhatsNewGenerationService
 
 
 class TextGenerator:
@@ -16,6 +17,7 @@ class TextGenerator:
         """初期化"""
         self.keyword_field_service = KeywordFieldGenerationService()
         self.title_service = TitleGenerationService()
+        self.whats_new_service = WhatsNewGenerationService()
 
     def generate_title(self, keywords: List[str], app_info: Dict[str, Any]) -> str:
         """
@@ -63,6 +65,25 @@ class TextGenerator:
             生成された説明文
         """
         pass
+
+    def generate_whats_new(
+        self,
+        primary_keyword: str,
+        app_features: List[str],
+        language: str = "ja"
+    ) -> Dict[str, Any]:
+        """
+        最新情報を生成する
+
+        Args:
+            primary_keyword: 主要キーワード
+            app_features: アプリの特徴リスト
+            language: 言語
+
+        Returns:
+            生成された最新情報
+        """
+        return self.whats_new_service.generate_whats_new(primary_keyword, app_features, language)
 
     def generate_keywords(self, keywords: List[str], app_info: Dict[str, Any]) -> str:
         """
