@@ -144,3 +144,13 @@ class KeywordSelectionResponse(BaseModel):
     reasoning: Optional[str] = Field(default=None, description="選定理由")
 
     model_config = ConfigDict(json_encoders={datetime: lambda v: v.isoformat()})
+
+
+# 新しく追加したモデル（モデル選択機能用）
+class ModelsResponse(BaseModel):
+    """モデル情報取得レスポンスモデル"""
+
+    recommended_models: List[str] = Field(..., description="推奨モデルリスト")
+    acceptable_models: List[str] = Field(..., description="許容モデルリスト")
+    current_default: str = Field(..., description="現在のデフォルトモデル")
+    model_categories: Dict[str, str] = Field(..., description="モデルカテゴリの説明")

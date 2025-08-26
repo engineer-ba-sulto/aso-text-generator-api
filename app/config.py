@@ -84,6 +84,14 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+        json_schema_extra = {
+            "example": {
+                "google_api_key": "your_google_api_key_here",
+                "gemini_api_key": "your_gemini_api_key_here",
+                "gemini_model": "gemini-2.5-flash",
+                "debug": False,
+            }
+        }
 
 
 # グローバル設定インスタンス
