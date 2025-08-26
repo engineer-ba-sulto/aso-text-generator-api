@@ -16,11 +16,35 @@ class ASOTextGenerationRequest(BaseModel):
     app_name: str
     features: List[str]
     language: str = Field(..., description="生成言語を指定 (ja: 日本語, en: 英語)")
+    model_name: Optional[str] = Field(
+        None,
+        description="使用するGeminiモデル名（指定しない場合は設定ファイルのデフォルトを使用）",
+    )
 
     @validator("language")
     def validate_language(cls, v):
         if v not in ["ja", "en"]:
             raise ValueError('language must be either "ja" or "en"')
+        return v
+
+    @validator("model_name")
+    def validate_model_name(cls, v):
+        if v is not None:
+            from app.config import settings
+
+            if not settings.is_valid_model(v):
+                category = settings.get_model_category(v)
+                if category == "deprecated":
+                    raise ValueError(
+                        f"非推奨モデル '{v}' は使用できません。"
+                        f"推奨モデル: {settings.RECOMMENDED_MODELS}, "
+                        f"許容モデル: {settings.ACCEPTABLE_MODELS}"
+                    )
+                else:
+                    raise ValueError(
+                        f"無効なモデル '{v}' が指定されました。"
+                        f"利用可能なモデル: {settings.available_models}"
+                    )
         return v
 
 
@@ -57,11 +81,35 @@ class SubtitleRequest(BaseModel):
     primary_keyword: str = Field(..., description="主要キーワード")
     features: List[str] = Field(..., description="アプリの特徴リスト")
     language: str = Field(..., description="生成言語を指定 (ja: 日本語, en: 英語)")
+    model_name: Optional[str] = Field(
+        None,
+        description="使用するGeminiモデル名（指定しない場合は設定ファイルのデフォルトを使用）",
+    )
 
     @validator("language")
     def validate_language(cls, v):
         if v not in ["ja", "en"]:
             raise ValueError('language must be either "ja" or "en"')
+        return v
+
+    @validator("model_name")
+    def validate_model_name(cls, v):
+        if v is not None:
+            from app.config import settings
+
+            if not settings.is_valid_model(v):
+                category = settings.get_model_category(v)
+                if category == "deprecated":
+                    raise ValueError(
+                        f"非推奨モデル '{v}' は使用できません。"
+                        f"推奨モデル: {settings.RECOMMENDED_MODELS}, "
+                        f"許容モデル: {settings.ACCEPTABLE_MODELS}"
+                    )
+                else:
+                    raise ValueError(
+                        f"無効なモデル '{v}' が指定されました。"
+                        f"利用可能なモデル: {settings.available_models}"
+                    )
         return v
 
 
@@ -71,6 +119,10 @@ class DescriptionRequest(BaseModel):
     primary_keyword: str = Field(..., description="主要キーワード")
     features: List[str] = Field(..., description="アプリの特徴リスト")
     language: str = Field(..., description="生成言語を指定 (ja: 日本語, en: 英語)")
+    model_name: Optional[str] = Field(
+        None,
+        description="使用するGeminiモデル名（指定しない場合は設定ファイルのデフォルトを使用）",
+    )
 
     @validator("language")
     def validate_language(cls, v):
@@ -78,15 +130,36 @@ class DescriptionRequest(BaseModel):
             raise ValueError('language must be either "ja" or "en"')
         return v
 
+    @validator("model_name")
+    def validate_model_name(cls, v):
+        if v is not None:
+            from app.config import settings
+
+            if not settings.is_valid_model(v):
+                category = settings.get_model_category(v)
+                if category == "deprecated":
+                    raise ValueError(
+                        f"非推奨モデル '{v}' は使用できません。"
+                        f"推奨モデル: {settings.RECOMMENDED_MODELS}, "
+                        f"許容モデル: {settings.ACCEPTABLE_MODELS}"
+                    )
+                else:
+                    raise ValueError(
+                        f"無効なモデル '{v}' が指定されました。"
+                        f"利用可能なモデル: {settings.available_models}"
+                    )
+        return v
+
 
 class WhatsNewRequest(BaseModel):
     """最新情報生成のリクエストモデル"""
+
     features: List[str] = Field(..., description="アプリの特徴リスト")
     language: str = Field(..., description="生成言語を指定 (ja: 日本語, en: 英語)")
 
-    @validator('language')
+    @validator("language")
     def validate_language(cls, v):
-        if v not in ['ja', 'en']:
+        if v not in ["ja", "en"]:
             raise ValueError('language must be either "ja" or "en"')
         return v
 

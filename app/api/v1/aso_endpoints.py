@@ -7,6 +7,7 @@ from typing import Any, Dict, List
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
+from app.config import settings
 from app.models.request_models import (
     ASORequest,
     ASOTextGenerationRequest,
@@ -21,6 +22,7 @@ from app.models.response_models import (
     CSVAnalysisResponse,
     DescriptionResponse,
     KeywordFieldResponse,
+    ModelsResponse,
     SubtitleResponse,
     TitleResponse,
     WhatsNewResponse,
@@ -28,6 +30,7 @@ from app.models.response_models import (
 from app.services.aso_text_orchestrator import ASOTextOrchestrator
 from app.services.csv_analyzer import CSVAnalyzer
 from app.services.description_generator import DescriptionGenerator
+from app.services.gemini_generator import GeminiGenerator
 from app.services.individual_text_orchestrator import IndividualTextOrchestrator
 from app.services.keyword_field_generator import KeywordFieldGenerator
 from app.services.keyword_selector import KeywordSelector
@@ -61,17 +64,18 @@ def get_title_generator() -> TitleGenerator:
 
 
 def get_subtitle_generator() -> SubtitleGenerator:
-    from app.services.gemini_generator import GeminiGenerator
-
     gemini_generator = GeminiGenerator()
     return SubtitleGenerator(gemini_generator)
 
 
 def get_description_generator() -> DescriptionGenerator:
-    from app.services.gemini_generator import GeminiGenerator
-
     gemini_generator = GeminiGenerator()
     return DescriptionGenerator(gemini_generator)
+
+
+def create_gemini_generator(model_name: str = None) -> GeminiGenerator:
+    """指定されたモデルでGeminiGeneratorを作成"""
+    return GeminiGenerator(model_name=model_name)
 
 
 def get_whats_new_generator() -> WhatsNewGenerator:
@@ -84,6 +88,26 @@ def get_response_builder() -> ResponseBuilder:
 
 def get_individual_text_orchestrator() -> IndividualTextOrchestrator:
     return IndividualTextOrchestrator()
+
+
+@router.get("/models", response_model=ModelsResponse)
+async def get_available_models():
+    """
+    利用可能なGeminiモデルの一覧を取得するエンドポイント
+
+    Returns:
+        推奨モデルと許容モデルのリスト
+    """
+    return ModelsResponse(
+        recommended_models=settings.RECOMMENDED_MODELS,
+        acceptable_models=settings.ACCEPTABLE_MODELS,
+        current_default=settings.gemini_model,
+        model_categories={
+            "recommended": "最新の推奨モデル（最高性能）",
+            "acceptable": "許容モデル（明示的に要求された場合のみ使用）",
+            "deprecated": "非推奨モデル（使用禁止）",
+        },
+    )
 
 
 @router.post("/generate-aso-texts", response_model=ASOTextGenerationResponse)

@@ -30,6 +30,10 @@ ASO（App Store Optimization）最適化のためのテキスト生成 API
 - **`POST /api/v1/select-keywords`**: キーワード選定
 - **`POST /api/v1/optimized/generate-aso-texts`**: 最適化された統合生成
 
+### モデル情報エンドポイント
+
+- **`GET /api/v1/models`**: 利用可能な Gemini モデルの一覧を取得
+
 ## 🛠️ 技術スタック
 
 ### バックエンド
@@ -98,6 +102,42 @@ cp env.example .env
 
 # .envファイルを編集して必要な設定を行う
 # 特にGOOGLE_API_KEYとGEMINI_API_KEYを設定してください
+```
+
+### 5. Gemini モデルの設定（オプション）
+
+```bash
+# .envファイルでGeminiモデルを指定
+GEMINI_MODEL=gemini-2.5-flash  # デフォルト（推奨）
+# または
+GEMINI_MODEL=gemini-2.5-pro    # 高精度モデル
+# または
+GEMINI_MODEL=gemini-2.0-flash  # 高速モデル
+```
+
+### 6. 環境変数の設定例
+
+`.env`ファイルの設定例：
+
+```bash
+# Google AI API設定
+GOOGLE_API_KEY=your_google_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Geminiモデル設定
+GEMINI_MODEL=gemini-model
+
+# Gemini API設定
+GEMINI_TIMEOUT=30
+GEMINI_MAX_RETRIES=3
+
+# アプリケーション設定
+DEBUG=false
+LOG_LEVEL=INFO
+
+# サーバー設定
+HOST=0.0.0.0
+PORT=8000
 ```
 
 #### 必要な環境変数
@@ -270,6 +310,41 @@ ipython
 ```
 
 ## 📝 API ドキュメント
+
+### モデル選択機能
+
+#### 利用可能なモデルの確認
+
+```http
+GET /api/v1/models
+```
+
+**レスポンス例:**
+
+```json
+{
+  "recommended_models": ["gemini-2.5-flash", "gemini-2.5-pro"],
+  "acceptable_models": ["gemini-2.0-flash", "gemini-2.0-pro"],
+  "current_default": "gemini-2.5-flash",
+  "model_categories": {
+    "recommended": "最新の推奨モデル（最高性能）",
+    "acceptable": "許容モデル（明示的に要求された場合のみ使用）",
+    "deprecated": "非推奨モデル（使用禁止）"
+  }
+}
+```
+
+#### リクエストでのモデル指定
+
+```json
+{
+  "csv_file": "file",
+  "app_name": "string",
+  "features": ["string"],
+  "language": "ja",
+  "model_name": "gemini-2.5-pro" // オプション：使用するモデルを指定
+}
+```
 
 ### 主要エンドポイント
 
